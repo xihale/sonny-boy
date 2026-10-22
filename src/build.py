@@ -1,6 +1,6 @@
 """生成 index.html 与 assets/。需要官方站素材目录 OFF(见 README)。
 用法: python3 src/build.py <OFF 目录>   (OFF/img 内含 stpEE_NN.jpg 与 chara_face_*.png)"""
-import json, sys, os, base64, io, hashlib
+import json, sys, os, re, base64, io, hashlib
 from PIL import Image
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.dirname(HERE)
 OFF=(sys.argv[1] if len(sys.argv)>1 else '/data/sb/off').rstrip('/')+'/img/'
@@ -56,8 +56,21 @@ PRO={}
 for k in ('01_01','01_07'):
     b=io.BytesIO();im=Image.open(f'{OFF}stp{k}.jpg').convert('RGB');im.thumbnail((800,800));im.save(b,'WEBP',quality=60)
     PRO[k]='data:image/webp;base64,'+base64.b64encode(b.getvalue()).decode()
-t=open(HERE+'/template.html',encoding='utf-8').read()
 J=lambda o:json.dumps(o,ensure_ascii=False,separators=(',',':'))
-t=t.replace('/*KEYS*/[]',J(keys)).replace('/*PRO*/{}',J(PRO)).replace('/*KMAP*/{}',J(KMAP)).replace('/*EPS*/[]',J(EPS)).replace('/*CAST*/[]',J([list(c) for c in CAST]))
+data_js=('const KEYS='+J(keys)+';\nconst PRO='+J(PRO)+';\nconst KMAP='+J(KMAP)+';\n'
+         'const EPS='+J(EPS)+';\nconst CAST='+J([list(c) for c in CAST])+';\n')
+def emit(logical,content,ext):
+    b=content.encode()
+    name=f'{logical}_{hashlib.sha256(b).hexdigest()[:8]}.{ext}'
+    open(f'{ROOT}/assets/{name}','wb').write(b)
+    return f'assets/{name}'
+refs=[emit('app',open(HERE+'/style.css',encoding='utf-8').read(),'css'),
+      emit('data',data_js,'js'),
+      emit('app',open(HERE+'/main.js',encoding='utf-8').read(),'js')]
+for f in os.listdir(ROOT+'/assets'):
+    if re.fullmatch(r'(app|data)_[0-9a-f]{8}\.(css|js)',f) and 'assets/'+f not in refs:
+        os.remove(f'{ROOT}/assets/{f}')
+t=open(HERE+'/template.html',encoding='utf-8').read()
+t=t.replace('/*CSS*/',refs[0]).replace('/*DATA*/',refs[1]).replace('/*APP*/',refs[2])
 open(ROOT+'/index.html','w',encoding='utf-8').write(t)
 print('ok',len(keys),'stills')
