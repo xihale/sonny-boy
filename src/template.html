@@ -18,6 +18,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #bar{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 0;transform:scaleX(0);background:var(--ufg);z-index:30}
 #epi{position:fixed;left:max(20px,3vw);top:18px;z-index:30;height:44px;min-width:44px;padding:0 16px;border-radius:22px;background:var(--ubg);color:var(--ufg);font:400 16px/44px var(--en);letter-spacing:.14em;opacity:0;transition:opacity .4s,background .4s,color .4s;pointer-events:none}
 #epi.on{opacity:1}
+#snd{position:fixed;right:calc(max(20px,3vw) + 118px);top:18px;z-index:30;height:44px;padding:0 18px;border-radius:22px;background:var(--ubg);color:var(--ufg);font-size:16px;letter-spacing:.14em;transition:background .4s,color .4s}
 #idxbtn{position:fixed;right:max(20px,3vw);top:18px;z-index:30;height:44px;padding:0 20px;border-radius:22px;background:var(--ubg);color:var(--ufg);font-size:16px;letter-spacing:.14em;transition:background .4s,color .4s}
 
 /* ---------- prologue ---------- */
@@ -134,7 +135,7 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
  .mos{grid-template-columns:repeat(3,1fr);gap:4px}
  .idx ol{grid-template-columns:1fr}
  .pc{max-width:calc(100vw - 48px);bottom:max(10vh,72px)}
- #epi{left:12px}#idxbtn{right:12px}
+ #epi{left:12px}#idxbtn{right:12px}#snd{right:130px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sh{clip-path:none;transition:none}.sh img{transform:none;transition:none}.cue,#nd{animation:none}.pc{transition:none}}
 </style>
@@ -142,6 +143,7 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
 <body>
 <div id="bar"></div>
 <div id="epi" aria-hidden="true"></div>
+<button type="button" id="snd" aria-pressed="false">声音 关</button>
 <button type="button" id="idxbtn" aria-haspopup="dialog">目录</button>
 
 <section id="pro" aria-label="序">
@@ -215,8 +217,8 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
 <dialog id="lb" aria-label="剧照"><button type="button" class="x" id="lbx">关闭</button><div class="lb"><img id="lbi" alt=""></div><div class="lbn"><button type="button" id="lbp" aria-label="上一张">←</button><span id="lbt"></span><button type="button" id="lbnx" aria-label="下一张">→</button></div></dialog>
 
 <script>
-const IMGS=/*IMGS*/{};
-const FACES=/*FACES*/{};
+const KEYS=/*KEYS*/[];
+const PRO=/*PRO*/{};
 const EPS=/*EPS*/[];
 const CAST=/*CAST*/[];
 const PRESETS=[
@@ -226,8 +228,8 @@ const PRESETS=[
 ];
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const src=k=>'data:image/webp;base64,'+IMGS[k];
-const fsrc=k=>'data:image/webp;base64,'+FACES[k];
+const src=k=>'assets/stills/'+k+'.webp';
+const fsrc=k=>'assets/faces/'+k+'.webp';
 const pad=n=>String(n).padStart(2,'0');
 /* ---------- build episodes ---------- */
 const eps=$('#eps');
@@ -248,7 +250,7 @@ CAST.forEach((c,i)=>(i<11?$('#g1'):$('#g2')).appendChild(card(c)));
 /* band */
 ['12_03','08_01','09_09','02_02'].forEach(k=>$('#band').appendChild(shot(k,'16/9')));
 /* wall */
-const all=Object.keys(IMGS).sort();const mos=$('#mos');
+const all=KEYS;const mos=$('#mos');
 all.forEach(k=>{const b=document.createElement('button');b.type='button';b.dataset.k=k;b.dataset.ep=k.slice(0,2);b.setAttribute('aria-label','剧照 '+k.replace('_',' - '));const im=document.createElement('img');im.alt='';im.decoding='async';im.dataset.k=k;lazy.push(im);b.appendChild(im);mos.appendChild(b)});
 const chips=$('#chips');
 ['全部'].concat(EPS.map(e=>pad(e.n))).forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',i===0?'true':'false');b.addEventListener('click',()=>{$$('#chips button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');let c=0;$$('#mos button').forEach(m=>{const ok=i===0||m.dataset.ep===t;m.hidden=!ok;if(ok)c++});$('#wcount').textContent=c+' frames'});chips.appendChild(b)});
@@ -283,6 +285,19 @@ function ui(){
  if(c!==cur){cur=c;const r=document.documentElement.style;r.setProperty('--ubg',c.bg);r.setProperty('--ufg',c.fg);if(c.ep){epi.textContent='EP '+c.ep+' / 12';epi.classList.add('on')}else epi.classList.remove('on')}
 }
 addEventListener('scroll',ui,{passive:true});addEventListener('resize',ui);ui();
+/* ---------- background music ---------- */
+(function(){
+const au=new Audio('assets/audio/bgm.mp3');au.loop=true;au.preload='auto';au.volume=0;
+const snd=$('#snd');let playing=false,touched=false,fade;
+const label=()=>{snd.textContent=playing?'声音 开':'声音 关';snd.setAttribute('aria-pressed',playing)};
+function fadeTo(v,ms,done){clearInterval(fade);const s=au.volume,t0=performance.now();fade=setInterval(()=>{const k=Math.min(1,(performance.now()-t0)/ms);au.volume=Math.max(0,Math.min(1,s+(v-s)*k));if(k>=1){clearInterval(fade);if(done)done()}},50)}
+function on(){const p=au.play();if(p&&p.then)p.then(()=>{playing=true;label();fadeTo(.45,3000)}).catch(()=>{})}
+function off(){playing=false;label();fadeTo(0,700,()=>au.pause())}
+snd.addEventListener('click',()=>{touched=true;playing?off():on()});
+function first(e){if(e.target.closest&&e.target.closest('#snd'))return;['pointerdown','keydown'].forEach(v=>removeEventListener(v,first,true));if(!touched)on()}
+['pointerdown','keydown'].forEach(v=>addEventListener(v,first,true));
+document.addEventListener('visibilitychange',()=>{if(!playing)return;if(document.hidden)au.pause();else au.play().catch(()=>{})});
+})();
 /* ---------- prologue particle engine ---------- */
 (function(){
 const NS=4,N=16600,NL=36,T=N+NL*2;
@@ -395,7 +410,7 @@ function frame(now){
 }
 const ld=src_=>new Promise(r=>{const im=new Image();im.onload=()=>r(im);im.src=src_});
 let imgs;resize();if(gl)glInit();
-Promise.all([ld(src('01_01')),ld(src('01_07'))]).then(([a,b])=>{imgs={a,b};build(imgs);window.__ready=true;requestAnimationFrame(frame)});
+Promise.all([ld(PRO['01_01']),ld(PRO['01_07'])]).then(([a,b])=>{imgs={a,b};build(imgs);window.__ready=true;requestAnimationFrame(frame)});
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{resize();if(imgs)build(imgs)},150)});
 })();
 </script>
