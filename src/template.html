@@ -228,6 +228,7 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
 <script>
 const KEYS=/*KEYS*/[];
 const PRO=/*PRO*/{};
+const KMAP=/*KMAP*/{};
 const EPS=/*EPS*/[];
 const CAST=/*CAST*/[];
 const PRESETS=[
@@ -237,8 +238,8 @@ const PRESETS=[
 ];
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const src=k=>'assets/stills/'+k+'.webp';
-const fsrc=k=>'assets/faces/'+k+'.webp';
+const src=k=>'assets/'+(KMAP['stills/'+k]||('stills/'+k+'.webp'));
+const fsrc=k=>'assets/'+(KMAP['faces/'+k]||('faces/'+k+'.webp'));
 const pad=n=>String(n).padStart(2,'0');
 /* ---------- build episodes ---------- */
 const eps=$('#eps');

@@ -1,6 +1,6 @@
 """生成 index.html 与 assets/。需要官方站素材目录 OFF(见 README)。
 用法: python3 src/build.py <OFF 目录>   (OFF/img 内含 stpEE_NN.jpg 与 chara_face_*.png)"""
-import json, sys, os, base64, io
+import json, sys, os, base64, io, hashlib
 from PIL import Image
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.dirname(HERE)
 OFF=(sys.argv[1] if len(sys.argv)>1 else '/data/sb/off').rstrip('/')+'/img/'
@@ -29,20 +29,28 @@ for e in EPS:
         for n,c in sorted(im.getcolors(),reverse=True)[:3]:
             if all(sum(abs(a-b) for a,b in zip(c,p))>90 for p in pal): pal.append(c)
     e['pal']=[hexc(c) for c in pal[:6]];e['bg']=hexc(bg);e['fg']=hexc(fg)
-# --- assets ---
+# --- assets: content-hashed filenames -> immutable browser caching;
+# index.html (no-cache) always carries the current mapping via KMAP ---
+KMAP={}
 os.makedirs(ROOT+'/assets/stills',exist_ok=True);os.makedirs(ROOT+'/assets/faces',exist_ok=True)
 keys=[]
+def put(dirn,logical,im,q):
+    b=io.BytesIO();im.save(b,'WEBP',quality=q,method=6)
+    name=f'{logical}_{hashlib.sha256(b.getvalue()).hexdigest()[:8]}.webp'
+    open(f'{ROOT}/assets/{dirn}/{name}','wb').write(b.getvalue())
+    KMAP[f'{dirn}/{logical}']=f'{dirn}/{name}'
 for f in sorted(os.listdir(OFF)):
     if f.startswith('stp') and f.endswith('.jpg'):
         k=f[3:-4];keys.append(k)
-        o=f'{ROOT}/assets/stills/{k}.webp'
-        if not os.path.exists(o): Image.open(OFF+f).convert('RGB').save(o,quality=60,method=6)
+        put('stills',k,Image.open(OFF+f).convert('RGB'),60)
 for f in sorted(os.listdir(OFF)):
     if f.startswith('chara_face_'):
-        o=f'{ROOT}/assets/faces/{f[11:-4]}.webp'
-        if os.path.exists(o): continue
         im=Image.open(OFF+f).convert('RGBA');im.thumbnail((520,520),Image.LANCZOS)
-        im.save(o,quality=75,method=6)
+        put('faces',f[11:-4],im,75)
+for d in ('stills','faces'):
+    keep={v.split('/',1)[1] for k,v in KMAP.items() if v.startswith(d+'/')}
+    for f in os.listdir(f'{ROOT}/assets/{d}'):
+        if f not in keep: os.remove(f'{ROOT}/assets/{d}/{f}')
 # prologue samples must be inline (file:// canvases cannot read external images)
 PRO={}
 for k in ('01_01','01_07'):
@@ -50,6 +58,6 @@ for k in ('01_01','01_07'):
     PRO[k]='data:image/webp;base64,'+base64.b64encode(b.getvalue()).decode()
 t=open(HERE+'/template.html',encoding='utf-8').read()
 J=lambda o:json.dumps(o,ensure_ascii=False,separators=(',',':'))
-t=t.replace('/*KEYS*/[]',J(keys)).replace('/*PRO*/{}',J(PRO)).replace('/*EPS*/[]',J(EPS)).replace('/*CAST*/[]',J([list(c) for c in CAST]))
+t=t.replace('/*KEYS*/[]',J(keys)).replace('/*PRO*/{}',J(PRO)).replace('/*KMAP*/{}',J(KMAP)).replace('/*EPS*/[]',J(EPS)).replace('/*CAST*/[]',J([list(c) for c in CAST]))
 open(ROOT+'/index.html','w',encoding='utf-8').write(t)
 print('ok',len(keys),'stills')
