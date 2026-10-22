@@ -181,8 +181,8 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
  <div class="sec-h"><h2 id="make-h">制作</h2><span>Staff</span></div>
  <div class="mk">
   <div>
-   <p class="quote">说明少、留白多。<br>怎么解读,都可以。</p>
-   <p class="qby">— 夏目真悟(监督・脚本・原作),官方网站 Staff 评论</p>
+   <p class="quote" lang="ja">説明が少なく余白の多い内容になっていますが、<br>どう解釈してもらっても大丈夫な作品です。</p>
+   <p class="qby">— 夏目真悟(监督・脚本・原作),官方网站 Staff 评论<br>“说明很少、留白很多。无论怎么解读,都没有问题。希望大家自由地接受它。”</p>
   </div>
   <div>
    <dl class="st">
@@ -201,9 +201,9 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
   </div>
  </div>
  <div class="facts">
-  <div class="fact"><b>NO MONOLOGUE</b><p>企划初期,夏目给自己定了一条规则:角色不做独白。观众只能从人物的行动里读出他们的情绪。</p></div>
-  <div class="fact"><b>PAINTED</b><p>背景坚持手绘,美术监督参考亨利·卢梭等画家,大量使用互补色。</p></div>
-  <div class="fact"><b>2003 → 2021</b><p>江口寿史上一次为连续 TV 动画担任角色原案,是 2003 年的《无人行星 Survive》,相隔 18 年。</p></div>
+  <div class="fact"><b>NO MONOLOGUE</b><p>企划之初,夏目给自己立下一条规则:角色不做内心独白。观众只能从人物的行动中,读出他们的情绪。</p></div>
+  <div class="fact"><b>PAINTED</b><p>背景坚持手绘,美术监督藤野真里从亨利·卢梭等画家的作品里取经,大量使用互补色。</p></div>
+  <div class="fact"><b>2003 → 2021</b><p>江口寿史上一次为连续 TV 动画担任角色原案,是 2003 年的《无人惑星 Survive》——相隔 18 年。</p></div>
  </div>
  <div class="band" id="band"></div>
  <div class="music" aria-label="参与音乐的艺术家">
@@ -248,7 +248,7 @@ function shot(k,ratio,extra){const d=document.createElement('div');d.className='
 EPS.forEach((e,i)=>{
  const s=document.createElement('section');s.className='ep'+(i%2?' flip':'');s.id='ep'+pad(e.n);s.dataset.ep=pad(e.n);s.dataset.bg=e.bg;s.dataset.fg=e.fg;s.setAttribute('aria-labelledby','t'+e.n);
  s.style.setProperty('--bg',e.bg);s.style.setProperty('--fg',e.fg);
- s.innerHTML='<div class="info"><div class="num" aria-hidden="true">'+pad(e.n)+'</div><h2 id="t'+e.n+'" lang="ja">'+e.jp+'</h2><p class="cn">'+e.cn+'</p><p class="en">'+e.en+'</p><p class="syn">'+e.syn+'</p><dl class="meta"><div><dt>首播</dt><dd>'+e.date+'</dd></div><div><dt>制作</dt><dd>'+e.staff+'</dd></div></dl><div class="sw" aria-hidden="true">'+e.pal.map(c=>'<i style="background:'+c+'"></i>').join('')+'</div></div><div class="shots"></div>';
+ s.innerHTML='<div class="info"><div class="num" aria-hidden="true">'+pad(e.n)+'</div><h2 id="t'+e.n+'" lang="ja">'+e.jp+'</h2><p class="cn">'+e.cn+'</p><p class="en">'+e.en+'</p><p class="syn">'+e.syn+'</p><dl class="meta"><div><dt>首播</dt><dd>'+e.date+'</dd></div><div><dt>OST</dt><dd>'+e.ost+'</dd></div><div><dt>制作</dt><dd>'+e.staff+'</dd></div></dl><div class="sw" aria-hidden="true">'+e.pal.map(c=>'<i style="background:'+c+'"></i>').join('')+'</div></div><div class="shots"></div>';
  const wrap=s.querySelector('.shots');let n=0;
  PRESETS[i%3].forEach(row=>{const r=document.createElement('div');r.className='row';row.forEach(c=>{const d=shot(e.imgs[n],c[2],c[3]);d.dataset.i=n;n++;d.style.gridColumn=c[0]+' / span '+c[1];r.appendChild(d)});wrap.appendChild(r)});
  eps.appendChild(s)});
