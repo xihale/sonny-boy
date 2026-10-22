@@ -35,11 +35,14 @@ keys=[]
 for f in sorted(os.listdir(OFF)):
     if f.startswith('stp') and f.endswith('.jpg'):
         k=f[3:-4];keys.append(k)
-        Image.open(OFF+f).convert('RGB').save(f'{ROOT}/assets/stills/{k}.webp',quality=84,method=6)
+        o=f'{ROOT}/assets/stills/{k}.webp'
+        if not os.path.exists(o): Image.open(OFF+f).convert('RGB').save(o,quality=84,method=6)
 for f in sorted(os.listdir(OFF)):
     if f.startswith('chara_face_'):
+        o=f'{ROOT}/assets/faces/{f[11:-4]}.webp'
+        if os.path.exists(o): continue
         im=Image.open(OFF+f).convert('RGBA');im.thumbnail((520,520),Image.LANCZOS)
-        im.save(f'{ROOT}/assets/faces/{f[11:-4]}.webp',quality=88,method=6)
+        im.save(o,quality=88,method=6)
 # prologue samples must be inline (file:// canvases cannot read external images)
 PRO={}
 for k in ('01_01','01_07'):

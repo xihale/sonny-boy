@@ -124,18 +124,27 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
 .lbn button{height:44px;min-width:44px;padding:0 16px;border:1px solid #fff;border-radius:22px;color:#fff}
 
 @media (max-width:900px){
- .ep,.ep.flip{display:block;padding:12vh 20px 12vh}
+ .ep,.ep.flip{display:block;padding:max(96px,12vh) 20px 12vh}
  .info{position:static;margin-bottom:6vh}
  .num{font-size:clamp(96px,30vw,150px)}
- .row{grid-template-columns:repeat(8,1fr)}
- .grid{grid-template-columns:repeat(2,1fr);gap:4vh 14px}
+ .shots{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .row{display:contents}
+ .shots .sh{grid-column:auto!important;margin-top:0!important;aspect-ratio:1/1!important}
+ .shots .sh[data-i="0"],.shots .sh[data-i="3"]{grid-column:1/-1!important;aspect-ratio:16/9!important}
+ #cast{padding-top:max(110px,14vh)}
+ .grid{grid-template-columns:1fr;gap:0}
+ .card{display:grid;grid-template-columns:104px 1fr;column-gap:18px;align-content:start;padding:18px 0;border-bottom:1px solid rgba(21,23,26,.25)}
+ .face{grid-row:1/span 4;margin:0;border:0}
+ .card>:not(.face){grid-column:2}
+ .pw{margin:8px 0 4px;justify-self:start}
+ .sec-h{margin-bottom:5vh}
  .mk{display:block}.mk>div+div{margin-top:7vh}
  .facts{grid-template-columns:1fr;gap:5vh}
  .band{grid-template-columns:repeat(2,1fr)}
  .mos{grid-template-columns:repeat(3,1fr);gap:4px}
  .idx ol{grid-template-columns:1fr}
  .pc{max-width:calc(100vw - 48px);bottom:max(10vh,72px)}
- #epi{left:12px}#idxbtn{right:12px}#snd{right:130px}
+ #epi,#idxbtn,#snd{top:12px;height:40px;padding:0 14px;line-height:40px}#epi{left:12px}#idxbtn{right:12px}#snd{right:98px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sh{clip-path:none;transition:none}.sh img{transform:none;transition:none}.cue,#nd{animation:none}.pc{transition:none}}
 </style>
@@ -153,7 +162,7 @@ dialog::backdrop{background:rgba(0,0,0,.92)}
   <div class="shade" id="shade"></div>
   <div class="pc" data-i="0"><b>2021</b><p>TV 动画 · Madhouse · 全 12 话<br>2021.07.16 — 2021.10.01</p></div>
   <div class="pc" data-i="1"><b>8.16</b><p>8 月 16 日,36 名中学三年级学生连同学校,一起漂进虚空。</p></div>
-  <div class="pc" data-i="2"><b>コンパス</b><p>漂流让每个人获得一种能力。希的能力是指南针:能看见指向一点的光,只有她看得见。</p></div>
+  <div class="pc" data-i="2" aria-hidden="true"></div>
   <div class="pc" data-i="3"><b>EP 01</b><p>夏の果ての島</p></div>
   <span class="cue" aria-hidden="true"></span>
  </div>
@@ -241,7 +250,7 @@ EPS.forEach((e,i)=>{
  s.style.setProperty('--bg',e.bg);s.style.setProperty('--fg',e.fg);
  s.innerHTML='<div class="info"><div class="num" aria-hidden="true">'+pad(e.n)+'</div><h2 id="t'+e.n+'" lang="ja">'+e.jp+'</h2><p class="cn">'+e.cn+'</p><p class="en">'+e.en+'</p><p class="syn">'+e.syn+'</p><dl class="meta"><div><dt>首播</dt><dd>'+e.date+'</dd></div><div><dt>制作</dt><dd>'+e.staff+'</dd></div></dl><div class="sw" aria-hidden="true">'+e.pal.map(c=>'<i style="background:'+c+'"></i>').join('')+'</div></div><div class="shots"></div>';
  const wrap=s.querySelector('.shots');let n=0;
- PRESETS[i%3].forEach(row=>{const r=document.createElement('div');r.className='row';row.forEach(c=>{const d=shot(e.imgs[n++],c[2],c[3]);d.style.gridColumn=c[0]+' / span '+c[1];r.appendChild(d)});wrap.appendChild(r)});
+ PRESETS[i%3].forEach(row=>{const r=document.createElement('div');r.className='row';row.forEach(c=>{const d=shot(e.imgs[n],c[2],c[3]);d.dataset.i=n;n++;d.style.gridColumn=c[0]+' / span '+c[1];r.appendChild(d)});wrap.appendChild(r)});
  eps.appendChild(s)});
 /* mobile row layout: handled with CSS grid spans as-is */
 /* cast */
@@ -339,9 +348,9 @@ function build(imgs){
  const M=mobile(),vm=Math.min(vw,vh);scenes=[];dyn=null;sd=7;
  const orders=[];for(let s=0;s<NS;s++)orders.push(shuffle());
  for(let s=0;s<NS;s++)scenes.push(newScene(s));
- {const fs=M?vw*.15:Math.min(vw*.13,230),x=vw*(M?.07:.06),y=vh*(M?.46:.52);
-  const w=Math.ceil(vw),h=Math.ceil(fs*1.5);
-  const q=sampleDraw(w,h,c=>{c.font='400 '+fs+'px Georgia,"Times New Roman",serif';c.textBaseline='alphabetic';c.fillText('Sonny Boy',x,fs*1.1)},Math.max(2,Math.round(fs/60)),Math.max(1.7,fs/70),[1,1,1],0,y-fs*1.1,.95);
+ {const fs=M?vw*.3:Math.min(vw*.13,230),x=vw*(M?.08:.06),y=vh*(M?.4:.52);
+  const w=Math.ceil(vw),h=Math.ceil(fs*(M?2.5:1.5)),sz=Math.max(2,Math.round(fs/60)),dt=Math.max(1.7,fs/70);
+  const q=sampleDraw(w,h,c=>{c.font='400 '+fs+'px Georgia,"Times New Roman",serif';c.textBaseline='alphabetic';if(M){c.fillText('Sonny',x,fs);c.fillText('Boy',x,fs*2.1)}else c.fillText('Sonny Boy',x,fs*1.1)},sz,dt,[1,1,1],0,y-(M?fs:fs*1.1),.95);
   place(scenes[0],orders[0],q)}
  {const dw=M?vw*1.0:Math.min(vw*.78,1180),dh=dw*9/16,dx=M?-vw*.06:vw*.04,dy=(vh-dh)/2-(M?vh*.04:vh*.02),cell=Math.max(dw/132,6.2);
   place(scenes[1],orders[1],sampleImage(imgs.a,dx,dy,dw,dh,cell,true,.84))}
@@ -353,9 +362,6 @@ function build(imgs){
   const ns=Math.round(Ln/2.4);
   for(let k=0;k<ns;k++){const u=(k+.5)/ns;for(let m=0;m<2;m++){q.push([cx,cy,2,1,1,1,.32]);dd.push({j:q.length-1,u,side:-1,lat:(m-.5)*3*(1-u)})}}
   const sig=vm*.055;for(let k=0;k<520;k++){const gx=gauss(),gy=gauss(),r=Math.hypot(gx,gy),core=Math.exp(-r*r*1.2);q.push([lx+gx*sig,ly+gy*sig,1.8+core*7,.78+.22*core,.88+.12*core,1,.35+.65*core])}
-  const fs=vm*(M?.36:.4),w=Math.ceil(fs*1.2),h=Math.ceil(fs*1.2);
-  const g=sampleDraw(w,h,c=>{c.font='200 '+fs+'px "Noto Serif SC","Noto Serif CJK SC","Source Han Serif SC","Songti SC",serif';c.textBaseline='alphabetic';c.fillText('希',fs*.05,fs*.98)},Math.max(3,Math.round(fs/60)),Math.max(2,fs/80),[1,1,1],vw*.05,vh*(M?.07:.06),1);
-  for(const e of g)q.push(e);
   place(scenes[2],orders[2],q);
   dyn={sc:scenes[2],idx:dd.map(o=>({i:orders[2][o.j],u:o.u,side:o.side,lat:o.lat})),cx,cy,Ln}}
  {const cell=Math.max(M?8:9.3,Math.sqrt(vw*vh/15200)),cols=Math.ceil(vw/cell),rows=Math.ceil(vh/cell),dw=cols*cell,dh=rows*cell;

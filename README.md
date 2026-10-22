@@ -16,7 +16,7 @@ python3 -m http.server 8000   # 然后访问 http://localhost:8000
 
 ## 结构
 
-- `index.html` 页面(单文件,样式与脚本内联;序章用到的两张取样图内嵌,保证双击打开也能运行)
+- `index.html` 页面(样式与脚本内联;序章用到的两张取样图内嵌,保证双击打开也能运行)
 - `assets/stills/` 144 张官方剧照(webp,1000px)
 - `assets/faces/` 25 张官方角色立绘(webp,透明底)
 - `assets/audio/bgm.mp3` 背景音乐(原创氛围音,96 秒无缝循环,`src/make_bgm.py` 合成)
