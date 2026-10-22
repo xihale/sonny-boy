@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sonny Boy — 漂流之后</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--serif:"Noto Serif SC","Noto Serif CJK SC","Songti SC","Source Han Serif SC","Noto Serif JP","Hiragino Mincho ProN",serif;--sans:"Noto Sans SC","Noto Sans CJK SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;--en:Georgia,"Times New Roman",serif;--ubg:#000;--ufg:#fff}
+html{background:#000;scroll-behavior:smooth}
+body{background:#000;color:#fff;font-family:var(--sans);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- fixed ui ---------- */
+#bar{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 0;transform:scaleX(0);background:var(--ufg);z-index:30}
+#epi{position:fixed;left:max(20px,3vw);top:18px;z-index:30;height:44px;min-width:44px;padding:0 16px;border-radius:22px;background:var(--ubg);color:var(--ufg);font:400 16px/44px var(--en);letter-spacing:.14em;opacity:0;transition:opacity .4s,background .4s,color .4s;pointer-events:none}
+#epi.on{opacity:1}
+#idxbtn{position:fixed;right:max(20px,3vw);top:18px;z-index:30;height:44px;padding:0 20px;border-radius:22px;background:var(--ubg);color:var(--ufg);font-size:16px;letter-spacing:.14em;transition:background .4s,color .4s}
+
+/* ---------- prologue ---------- */
+#pro{position:relative;height:400svh}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.shade{position:absolute;left:0;right:0;bottom:0;height:46vh;background:linear-gradient(transparent,rgba(0,0,0,.8));pointer-events:none;opacity:0}
+.pc{position:absolute;left:max(6vw,24px);bottom:max(9vh,64px);max-width:min(66vw,620px);opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s;pointer-events:none;text-shadow:0 1px 14px rgba(0,0,0,.5)}
+.pc.on{opacity:1;transform:none}
+.pc b{display:block;font:400 16px/1 var(--en);letter-spacing:.2em;margin-bottom:14px;opacity:.8}
+.pc p{font-family:var(--serif);font-size:clamp(18px,1.7vw,24px);font-weight:300;line-height:1.8;letter-spacing:.05em}
+.cue{position:absolute;left:50%;bottom:0;width:1px;height:56px;background:linear-gradient(#fff,transparent);animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%,100%{opacity:.15}50%{opacity:.9}}
+
+/* ---------- episodes ---------- */
+.ep{position:relative;background:var(--bg);color:var(--fg);padding:14vh max(6vw,24px) 16vh;display:grid;grid-template-columns:minmax(300px,4fr) 8fr;gap:5vw;align-items:start}
+.ep.flip{grid-template-columns:8fr minmax(300px,4fr)}
+.ep.flip .info{grid-column:2;grid-row:1}
+.ep.flip .shots{grid-column:1;grid-row:1}
+.info{position:sticky;top:max(10vh,72px)}
+.num{font:400 clamp(110px,14vw,230px)/.9 var(--en);color:transparent;-webkit-text-stroke:1.5px var(--fg);letter-spacing:-.02em;margin-bottom:3vh}
+.info h2{font:300 clamp(32px,3.6vw,56px)/1.25 var(--serif);letter-spacing:.04em}
+.cn{font:400 clamp(20px,1.9vw,28px)/1.5 var(--serif);margin-top:12px}
+.en{font:italic 400 16px/1.5 var(--en);margin-top:4px}
+.syn{margin-top:3vh;font-size:16px;line-height:1.95;max-width:34em}
+.meta{margin-top:2.6vh;font-size:16px;line-height:1.7;border-top:1px solid currentColor;padding-top:14px;max-width:34em}
+.meta div{display:flex;gap:16px}.meta dt{flex:none;min-width:5.5em;font-family:var(--en)}
+.sw{display:flex;gap:6px;margin-top:20px}.sw i{width:26px;height:26px;border-radius:50%;display:block;border:1px solid rgba(127,127,127,.5)}
+.shots{display:flex;flex-direction:column;gap:3vw}
+.row{display:grid;grid-template-columns:repeat(8,1fr);column-gap:1.4vw;align-items:start}
+.sh{position:relative;overflow:hidden;background:rgba(127,127,127,.25)}
+.sh button{clip-path:inset(0 100% 0 0);transition:clip-path 1.1s cubic-bezier(.7,0,.2,1)}
+.sh.in button{clip-path:inset(0 0 0 0)}
+.sh img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.sh.in img{transform:scale(1)}
+.sh button{display:block;width:100%;height:100%;cursor:zoom-in}
+
+/* ---------- cast ---------- */
+#cast{background:#e9e7e1;color:#15171a;padding:16vh max(6vw,24px) 14vh}
+.sec-h{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;margin-bottom:7vh}
+.sec-h h2{font:300 clamp(40px,5vw,80px)/1.1 var(--serif);letter-spacing:.06em}
+.sec-h span{font:italic 400 16px var(--en);letter-spacing:.08em}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5vh 2.4vw}
+.card{display:flex;flex-direction:column}
+.face{aspect-ratio:5/6;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid #15171a;margin-bottom:14px;overflow:hidden}
+.face img{max-height:100%;width:auto;object-fit:contain;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.card:hover .face img{transform:translateY(-6px) scale(1.03)}
+.card h3{font:400 24px/1.3 var(--serif);letter-spacing:.04em}
+.cv{font-size:16px;color:#4a4d52}
+.pw{display:inline-block;align-self:flex-start;margin:10px 0 6px;font:500 16px/1.4 var(--serif);padding:2px 12px;border:1px solid #15171a;border-radius:20px}
+.card p{font-size:16px;line-height:1.75}
+.sub{margin:12vh 0 5vh;font:400 16px var(--en);letter-spacing:.2em;border-top:1px solid #15171a;padding-top:16px}
+
+/* ---------- making ---------- */
+#make{background:#0b0c0e;color:#f2f1ed;padding:16vh max(6vw,24px) 14vh}
+.mk{display:grid;grid-template-columns:5fr 7fr;gap:6vw;align-items:start}
+.quote{font:300 clamp(26px,3vw,46px)/1.55 var(--serif);letter-spacing:.04em}
+.qby{margin-top:20px;font-size:16px}
+dl.st{display:grid;grid-template-columns:max-content 1fr;gap:10px 28px;font-size:16px;line-height:1.7}
+dl.st dt{color:#a9a8a2}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:3vw;margin-top:12vh}
+.fact{border-top:1px solid #f2f1ed;padding-top:18px}
+.fact b{display:block;font:400 16px var(--en);letter-spacing:.2em;margin-bottom:10px}
+.fact p{font-size:16px;line-height:1.85}
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;margin-top:12vh}
+.band .sh{aspect-ratio:16/9}
+.music{margin-top:12vh;display:flex;flex-wrap:wrap;gap:10px 14px}
+.music span{border:1px solid #f2f1ed;border-radius:24px;padding:6px 18px;font-size:16px}
+
+/* ---------- wall ---------- */
+#wall{background:#141517;color:#f2f1ed;padding:16vh max(6vw,24px) 14vh}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:5vh}
+.chips button{min-width:44px;height:44px;padding:0 14px;border:1px solid #f2f1ed;border-radius:22px;font:400 16px var(--en);letter-spacing:.1em;transition:.3s}
+.chips button[aria-pressed="true"]{background:#f2f1ed;color:#141517}
+.mos{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.mos button{display:block;aspect-ratio:16/9;overflow:hidden;background:#222;cursor:zoom-in}
+.mos img{width:100%;height:100%;object-fit:cover;transition:transform .6s,opacity .6s;opacity:.88}
+.mos button:hover img,.mos button:focus-visible img{transform:scale(1.06);opacity:1}
+.mos button[hidden]{display:none}
+
+/* ---------- end ---------- */
+#end{background:#d9dcde;color:#15171a;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14vh 6vw 8vh;text-align:center;position:relative}
+#end svg{width:min(34vmin,260px);height:auto;overflow:visible}
+#nd{transform-origin:0 0;animation:spin 14s cubic-bezier(.45,.05,.55,.95) infinite}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.credit{position:absolute;left:max(6vw,24px);right:max(6vw,24px);bottom:5vh;font-size:16px;line-height:1.8;text-align:left;color:#3c4044}
+
+/* ---------- overlays ---------- */
+dialog{border:0;background:#050506;color:inherit;max-width:none;max-height:none;width:100vw;height:100vh;height:100dvh;padding:0;margin:0;inset:0}
+dialog::backdrop{background:rgba(0,0,0,.92)}
+#idx{color:#fff}
+.idx{height:100%;overflow:auto;padding:max(12vh,80px) max(6vw,24px) 8vh}
+.idx ol{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:0 3vw}
+.idx li a{display:flex;gap:18px;align-items:baseline;min-height:56px;padding:10px 0;border-bottom:1px solid #444;text-decoration:none;color:#fff}
+.idx li b{font:400 16px var(--en);letter-spacing:.14em;min-width:2.2em}
+.idx li span{font:300 20px/1.4 var(--serif)}
+.idx .extra{display:flex;flex-wrap:wrap;gap:10px;margin-top:6vh}
+.idx .extra a{display:inline-flex;align-items:center;min-height:44px;padding:0 22px;border:1px solid #fff;border-radius:22px;color:#fff;text-decoration:none}
+.x{position:fixed;right:max(20px,3vw);top:18px;height:44px;padding:0 20px;border-radius:22px;background:#fff;color:#000;font-size:16px;letter-spacing:.14em;z-index:2}
+.lb{display:grid;place-items:center;height:100%;padding:70px 3vw 70px}
+.lb img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.lbn{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;z-index:2;font:400 16px var(--en);letter-spacing:.12em;color:#fff}
+.lbn button{height:44px;min-width:44px;padding:0 16px;border:1px solid #fff;border-radius:22px;color:#fff}
+
+@media (max-width:900px){
+ .ep,.ep.flip{display:block;padding:12vh 20px 12vh}
+ .info{position:static;margin-bottom:6vh}
+ .num{font-size:clamp(96px,30vw,150px)}
+ .row{grid-template-columns:repeat(8,1fr)}
+ .grid{grid-template-columns:repeat(2,1fr);gap:4vh 14px}
+ .mk{display:block}.mk>div+div{margin-top:7vh}
+ .facts{grid-template-columns:1fr;gap:5vh}
+ .band{grid-template-columns:repeat(2,1fr)}
+ .mos{grid-template-columns:repeat(3,1fr);gap:4px}
+ .idx ol{grid-template-columns:1fr}
+ .pc{max-width:calc(100vw - 48px);bottom:max(10vh,72px)}
+ #epi{left:12px}#idxbtn{right:12px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sh{clip-path:none;transition:none}.sh img{transform:none;transition:none}.cue,#nd{animation:none}.pc{transition:none}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="epi" aria-hidden="true"></div>
+<button type="button" id="idxbtn" aria-haspopup="dialog">目录</button>
+
+<section id="pro" aria-label="序">
+ <div class="stage">
+  <h1 class="sr">Sonny Boy</h1>
+  <canvas id="cv" aria-hidden="true"></canvas>
+  <div class="shade" id="shade"></div>
+  <div class="pc" data-i="0"><b>2021</b><p>TV 动画 · Madhouse · 全 12 话<br>2021.07.16 — 2021.10.01</p></div>
+  <div class="pc" data-i="1"><b>8.16</b><p>8 月 16 日,36 名中学三年级学生连同学校,一起漂进虚空。</p></div>
+  <div class="pc" data-i="2"><b>コンパス</b><p>漂流让每个人获得一种能力。希的能力是指南针:能看见指向一点的光,只有她看得见。</p></div>
+  <div class="pc" data-i="3"><b>EP 01</b><p>夏の果ての島</p></div>
+  <span class="cue" aria-hidden="true"></span>
+ </div>
+</section>
+
+<main id="eps"></main>
+
+<section id="cast" aria-labelledby="cast-h">
+ <div class="sec-h"><h2 id="cast-h">角色与能力</h2><span>Cast</span></div>
+ <div class="grid" id="g1"></div>
+ <div class="sub">漂流途中</div>
+ <div class="grid" id="g2"></div>
+</section>
+
+<section id="make" aria-labelledby="make-h">
+ <div class="sec-h"><h2 id="make-h">制作</h2><span>Staff</span></div>
+ <div class="mk">
+  <div>
+   <p class="quote">说明少、留白多。<br>怎么解读,都可以。</p>
+   <p class="qby">— 夏目真悟(监督・脚本・原作),官方网站 Staff 评论</p>
+  </div>
+  <div>
+   <dl class="st">
+    <dt>监督・脚本・原作</dt><dd>夏目真悟</dd>
+    <dt>角色原案</dt><dd>江口寿史</dd>
+    <dt>动画制作</dt><dd>Madhouse</dd>
+    <dt>角色设计</dt><dd>久贝典史</dd>
+    <dt>美术监督</dt><dd>藤野真里(Studio Pablo)</dd>
+    <dt>色彩设计</dt><dd>桥本贤</dd>
+    <dt>摄影监督</dt><dd>伏原あかね</dd>
+    <dt>剪辑</dt><dd>木村佳史子</dd>
+    <dt>音响监督</dt><dd>はたしょう二</dd>
+    <dt>音乐顾问</dt><dd>渡边信一郎</dd>
+    <dt>主题歌</dt><dd>银杏BOYZ《少年少女》</dd>
+   </dl>
+  </div>
+ </div>
+ <div class="facts">
+  <div class="fact"><b>NO MONOLOGUE</b><p>企划初期,夏目给自己定了一条规则:角色不做独白。观众只能从人物的行动里读出他们的情绪。</p></div>
+  <div class="fact"><b>PAINTED</b><p>背景坚持手绘,美术监督参考亨利·卢梭等画家,大量使用互补色。</p></div>
+  <div class="fact"><b>2003 → 2021</b><p>江口寿史上一次为连续 TV 动画担任角色原案,是 2003 年的《无人行星 Survive》,相隔 18 年。</p></div>
+ </div>
+ <div class="band" id="band"></div>
+ <div class="music" aria-label="参与音乐的艺术家">
+  <span>落日飞车 Sunset Rollercoaster</span><span>VIDEOTAPEMUSIC</span><span>ザ・なつやすみバンド</span><span>ミツメ</span><span>Ogawa&amp;Tokoro</span><span>空中泥棒</span><span>カネヨリマサル</span><span>toe</span><span>コーニッシュ</span>
+ </div>
+</section>
+
+<section id="wall" aria-labelledby="wall-h">
+ <div class="sec-h"><h2 id="wall-h">剧照</h2><span id="wcount">144 frames</span></div>
+ <div class="chips" id="chips" role="group" aria-label="按话数筛选"></div>
+ <div class="mos" id="mos"></div>
+</section>
+
+<section id="end" aria-label="终">
+ <svg viewBox="-100 -100 200 200" aria-hidden="true"><circle r="92" fill="none" stroke="#15171a" stroke-opacity=".35" stroke-width="1"/><circle r="3" fill="#d9dcde" stroke="#15171a" stroke-width="1"/><g stroke="#15171a" stroke-opacity=".5" stroke-width="1"><path d="M0-98v-8M0 98v8M-98 0h-8M98 0h8"/></g><g id="nd"><path d="M0-84L-5 0h10Z" fill="#15171a"/><path d="M0 84L-5 0h10Z" fill="#15171a" fill-opacity=".25"/></g></svg>
+ <p class="credit">非官方同人致敬作品。画面与角色 © Sonny Boy committee,仅作设计演示。<br>文字为据官方网站(anime.shochiku.co.jp/sonny-boy)与 Wikipedia 整理的中文概述。</p>
+</section>
+
+<dialog id="idx" aria-label="目录"><button type="button" class="x" id="idxx">关闭</button><nav class="idx" aria-label="目录"><ol id="idxl"></ol><div class="extra"><a href="#cast">角色与能力</a><a href="#make">制作</a><a href="#wall">剧照</a></div></nav></dialog>
+<dialog id="lb" aria-label="剧照"><button type="button" class="x" id="lbx">关闭</button><div class="lb"><img id="lbi" alt=""></div><div class="lbn"><button type="button" id="lbp" aria-label="上一张">←</button><span id="lbt"></span><button type="button" id="lbnx" aria-label="下一张">→</button></div></dialog>
+
+<script>
+const IMGS=/*IMGS*/{};
+const FACES=/*FACES*/{};
+const EPS=/*EPS*/[];
+const CAST=/*CAST*/[];
+const PRESETS=[
+ [[[1,6,'16/9',0],[7,2,'3/4',9]],[[2,3,'1/1',0],[5,4,'16/9',5]],[[1,4,'16/9',0],[6,3,'3/4',7]]],
+ [[[3,6,'16/9',0],[1,2,'3/4',8]],[[1,4,'16/9',2],[5,3,'1/1',0]],[[3,3,'3/4',0],[6,3,'16/9',8]]],
+ [[[1,4,'3/4',0],[5,4,'16/9',6]],[[1,3,'1/1',2],[4,5,'16/9',0]],[[3,4,'16/9',0],[7,2,'3/4',7]]]
+];
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const src=k=>'data:image/webp;base64,'+IMGS[k];
+const fsrc=k=>'data:image/webp;base64,'+FACES[k];
+const pad=n=>String(n).padStart(2,'0');
+/* ---------- build episodes ---------- */
+const eps=$('#eps');
+const lazy=[];
+function shot(k,ratio,extra){const d=document.createElement('div');d.className='sh';d.style.aspectRatio=ratio;if(extra)d.style.marginTop=extra+'vw';
+ const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','放大剧照 '+k.replace('_',' - '));b.dataset.k=k;const im=document.createElement('img');im.alt='';im.decoding='async';im.dataset.k=k;lazy.push(im);b.appendChild(im);d.appendChild(b);return d}
+EPS.forEach((e,i)=>{
+ const s=document.createElement('section');s.className='ep'+(i%2?' flip':'');s.id='ep'+pad(e.n);s.dataset.ep=pad(e.n);s.dataset.bg=e.bg;s.dataset.fg=e.fg;s.setAttribute('aria-labelledby','t'+e.n);
+ s.style.setProperty('--bg',e.bg);s.style.setProperty('--fg',e.fg);
+ s.innerHTML='<div class="info"><div class="num" aria-hidden="true">'+pad(e.n)+'</div><h2 id="t'+e.n+'" lang="ja">'+e.jp+'</h2><p class="cn">'+e.cn+'</p><p class="en">'+e.en+'</p><p class="syn">'+e.syn+'</p><dl class="meta"><div><dt>首播</dt><dd>'+e.date+'</dd></div><div><dt>制作</dt><dd>'+e.staff+'</dd></div></dl><div class="sw" aria-hidden="true">'+e.pal.map(c=>'<i style="background:'+c+'"></i>').join('')+'</div></div><div class="shots"></div>';
+ const wrap=s.querySelector('.shots');let n=0;
+ PRESETS[i%3].forEach(row=>{const r=document.createElement('div');r.className='row';row.forEach(c=>{const d=shot(e.imgs[n++],c[2],c[3]);d.style.gridColumn=c[0]+' / span '+c[1];r.appendChild(d)});wrap.appendChild(r)});
+ eps.appendChild(s)});
+/* mobile row layout: handled with CSS grid spans as-is */
+/* cast */
+function card(c){const a=document.createElement('article');a.className='card';a.innerHTML='<div class="face"><img alt="" src="'+fsrc(c[0])+'"></div><h3 lang="ja">'+c[1]+'</h3>'+(c[2]?'<div class="cv">CV '+c[2]+'</div>':'')+(c[3]?'<span class="pw" lang="ja">'+c[3]+'</span>':'')+'<p>'+c[4]+'</p>';return a}
+CAST.forEach((c,i)=>(i<11?$('#g1'):$('#g2')).appendChild(card(c)));
+/* band */
+['12_03','08_01','09_09','02_02'].forEach(k=>$('#band').appendChild(shot(k,'16/9')));
+/* wall */
+const all=Object.keys(IMGS).sort();const mos=$('#mos');
+all.forEach(k=>{const b=document.createElement('button');b.type='button';b.dataset.k=k;b.dataset.ep=k.slice(0,2);b.setAttribute('aria-label','剧照 '+k.replace('_',' - '));const im=document.createElement('img');im.alt='';im.decoding='async';im.dataset.k=k;lazy.push(im);b.appendChild(im);mos.appendChild(b)});
+const chips=$('#chips');
+['全部'].concat(EPS.map(e=>pad(e.n))).forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',i===0?'true':'false');b.addEventListener('click',()=>{$$('#chips button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');let c=0;$$('#mos button').forEach(m=>{const ok=i===0||m.dataset.ep===t;m.hidden=!ok;if(ok)c++});$('#wcount').textContent=c+' frames'});chips.appendChild(b)});
+/* index */
+EPS.forEach(e=>{const li=document.createElement('li');li.innerHTML='<a href="#ep'+pad(e.n)+'"><b>'+pad(e.n)+'</b><span lang="ja">'+e.jp+'</span></a>';$('#idxl').appendChild(li)});
+/* lazy images */
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){const im=en.target;if(!im.src)im.src=src(im.dataset.k);io.unobserve(im)}}),{rootMargin:'900px 0px'});
+lazy.forEach(im=>io.observe(im));
+const rv=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');rv.unobserve(en.target)}}),{threshold:.12});
+$$('.sh').forEach(d=>{if(RM)d.classList.add('in');else rv.observe(d)});
+/* dialogs */
+const idx=$('#idx'),lb=$('#lb');let lbList=[],lbPos=0,lastFocus=null;
+const openD=(d)=>{lastFocus=document.activeElement;d.showModal()};
+$('#idxbtn').addEventListener('click',()=>openD(idx));$('#idxx').addEventListener('click',()=>idx.close());
+idx.addEventListener('click',e=>{if(e.target.closest('a'))idx.close()});
+function showLb(){const k=lbList[lbPos];$('#lbi').src=src(k);$('#lbt').textContent='EP '+k.slice(0,2)+' · '+(lbPos+1)+' / '+lbList.length}
+function openLb(k,list){lbList=list;lbPos=list.indexOf(k);showLb();openD(lb)}
+document.addEventListener('click',e=>{const b=e.target.closest('.sh button,.mos button');if(!b)return;const k=b.dataset.k;const ctx=b.closest('.mos')?$$('#mos button:not([hidden])').map(x=>x.dataset.k):[k];openLb(k,ctx)});
+$('#lbx').addEventListener('click',()=>lb.close());
+const step=d=>{if(lbList.length>1){lbPos=(lbPos+d+lbList.length)%lbList.length;showLb()}};
+$('#lbp').addEventListener('click',()=>step(-1));$('#lbnx').addEventListener('click',()=>step(1));
+lb.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)});
+lb.addEventListener('click',e=>{if(e.target===lb||e.target.classList.contains('lb'))lb.close()});
+[idx,lb].forEach(d=>d.addEventListener('close',()=>{if(lastFocus)lastFocus.focus()}));
+/* ---------- ui state ---------- */
+const bar=$('#bar'),epi=$('#epi'),ib=$('#idxbtn');
+const secs=[{el:$('#pro'),bg:'#000',fg:'#fff',ep:''},...$$('.ep').map(el=>({el,bg:el.dataset.bg,fg:el.dataset.fg,ep:el.dataset.ep})),{el:$('#cast'),bg:'#e9e7e1',fg:'#15171a',ep:''},{el:$('#make'),bg:'#0b0c0e',fg:'#f2f1ed',ep:''},{el:$('#wall'),bg:'#141517',fg:'#f2f1ed',ep:''},{el:$('#end'),bg:'#d9dcde',fg:'#15171a',ep:''}];
+let cur=null;
+function ui(){
+ const h=document.documentElement,max=h.scrollHeight-innerHeight;bar.style.transform='scaleX('+(max>0?scrollY/max:0)+')';
+ const mid=scrollY+innerHeight*.18;let c=secs[0];for(const s of secs){if(s.el.offsetTop<=mid)c=s}
+ if(c!==cur){cur=c;const r=document.documentElement.style;r.setProperty('--ubg',c.bg);r.setProperty('--ufg',c.fg);if(c.ep){epi.textContent='EP '+c.ep+' / 12';epi.classList.add('on')}else epi.classList.remove('on')}
+}
+addEventListener('scroll',ui,{passive:true});addEventListener('resize',ui);ui();
+/* ---------- prologue particle engine ---------- */
+(function(){
+const NS=4,N=16600,NL=36,T=N+NL*2;
+const cv=$('#cv');
+let gl=cv.getContext('webgl',{antialias:false,alpha:false});let ctx2=null;if(!gl)ctx2=cv.getContext('2d');
+let vw=innerWidth,vh=innerHeight,dpr=Math.min(devicePixelRatio||1,2);
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const mobile=()=>vw<=820;
+let sd=36;const rnd=()=>{sd=(sd*1664525+1013904223)%4294967296;return sd/4294967296};
+const gauss=()=>Math.sqrt(-2*Math.log(rnd()+1e-9))*Math.cos(6.2831853*rnd());
+const dl=new Float32Array(N),sw=new Float32Array(N),ph=new Float32Array(N),sp=new Float32Array(N),dX=new Float32Array(N),dY=new Float32Array(N);
+for(let i=0;i<N;i++){dl[i]=rnd()*.42;sw[i]=(rnd()-.5)*.9;ph[i]=rnd()*6.28;sp[i]=.15+rnd()*.5;dX[i]=rnd();dY[i]=rnd()}
+const lights=[];for(let i=0;i<NL;i++)lights.push({x:rnd(),y:rnd(),vx:(rnd()-.5)*.011,vy:(rnd()-.5)*.011,s:3+rnd()*2.2,a:.55+rnd()*.45});
+const ox=new Float32Array(N),oy=new Float32Array(N),vx=new Float32Array(N),vy=new Float32Array(N);
+const bgs=[[0,0,0],[0,0,0],[.012,.024,.05],[.02,.07,.16]];
+const lightA=[1,1,1,0],dustA=[.2,.12,.1,0],AMP=[16,2.4,2.4,2.4];
+const shuffle=()=>{const o=new Uint32Array(N);for(let i=0;i<N;i++)o[i]=i;for(let i=N-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const t=o[i];o[i]=o[j];o[j]=t}return o};
+const light=()=>mobile()?[.66*vw,.22*vh]:[.74*vw,.26*vh];
+let scenes=[],dyn=null,ready=false;
+const off=document.createElement('canvas'),oc=off.getContext('2d',{willReadFrequently:true});
+function newScene(si){const s={m:new Float32Array(N),x:new Float32Array(T),y:new Float32Array(T),s:new Float32Array(T),r:new Float32Array(T),g:new Float32Array(T),b:new Float32Array(T),a:new Float32Array(T),bg:bgs[si]};
+ for(let i=0;i<N;i++){s.x[i]=dX[i]*vw;s.y[i]=dY[i]*vh;s.s[i]=1.5;s.r[i]=.78;s.g[i]=.85;s.b[i]=1;s.a[i]=dustA[si];s.m[i]=AMP[si]}
+ for(let l=0;l<NL*2;l++){const i=N+l;s.s[i]=l<NL?lights[l].s:lights[l-NL].s*4;s.r[i]=s.g[i]=s.b[i]=1;s.a[i]=(l<NL?lights[l].a:.1)*lightA[si]}
+ return s}
+function place(sc,order,list){const n=Math.min(list.length,N);for(let j=0;j<n;j++){const i=order[j],q=list[j];sc.x[i]=q[0];sc.y[i]=q[1];sc.s[i]=q[2];sc.r[i]=q[3];sc.g[i]=q[4];sc.b[i]=q[5];sc.a[i]=q[6];sc.m[i]=RM?0:.7}}
+function sampleImage(img,dx,dy,dw,dh,cell,skipDark,sizeF,crop){
+ const cols=Math.round(dw/cell),rows=Math.round(dh/cell);off.width=cols;off.height=rows;
+ if(crop)oc.drawImage(img,crop[0],crop[1],crop[2],crop[3],0,0,cols,rows);else oc.drawImage(img,0,0,cols,rows);
+ const d=oc.getImageData(0,0,cols,rows).data,cw=dw/cols,ch=dh/rows,out=[];
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const k=(r*cols+c)*4,R=d[k],G=d[k+1],B=d[k+2];
+  if(skipDark&&R+G+B<26)continue;out.push([dx+(c+.5)*cw,dy+(r+.5)*ch,cw*sizeF,R/255,G/255,B/255,1])}
+ return out}
+function sampleDraw(w,h,drawFn,step,size,col,ox_,oy_,alpha){step=Math.max(1,Math.round(step));off.width=w;off.height=h;oc.clearRect(0,0,w,h);oc.fillStyle='#fff';drawFn(oc);
+ const d=oc.getImageData(0,0,w,h).data,out=[];
+ for(let y=0;y<h;y+=step)for(let x=0;x<w;x+=step){if(d[(y*w+x)*4+3]>110)out.push([ox_+x+(rnd()-.5)*step*.5,oy_+y+(rnd()-.5)*step*.5,size,col[0],col[1],col[2],alpha])}
+ return out}
+function build(imgs){
+ const M=mobile(),vm=Math.min(vw,vh);scenes=[];dyn=null;sd=7;
+ const orders=[];for(let s=0;s<NS;s++)orders.push(shuffle());
+ for(let s=0;s<NS;s++)scenes.push(newScene(s));
+ {const fs=M?vw*.15:Math.min(vw*.13,230),x=vw*(M?.07:.06),y=vh*(M?.46:.52);
+  const w=Math.ceil(vw),h=Math.ceil(fs*1.5);
+  const q=sampleDraw(w,h,c=>{c.font='400 '+fs+'px Georgia,"Times New Roman",serif';c.textBaseline='alphabetic';c.fillText('Sonny Boy',x,fs*1.1)},Math.max(2,Math.round(fs/60)),Math.max(1.7,fs/70),[1,1,1],0,y-fs*1.1,.95);
+  place(scenes[0],orders[0],q)}
+ {const dw=M?vw*1.0:Math.min(vw*.78,1180),dh=dw*9/16,dx=M?-vw*.06:vw*.04,dy=(vh-dh)/2-(M?vh*.04:vh*.02),cell=Math.max(dw/132,6.2);
+  place(scenes[1],orders[1],sampleImage(imgs.a,dx,dy,dw,dh,cell,true,.84))}
+ {const cx=vw/2,cy=vh/2-(M?vh*.04:0),R=vm*(M?.34:.3),Ln=vm*(M?.44:.46),q=[],dd=[],[lx,ly]=light();
+  const nR=Math.round(2*Math.PI*R/4);for(let k=0;k<nR;k++){const a=k/nR*6.2832;q.push([cx+Math.cos(a)*R,cy+Math.sin(a)*R,1.6,1,1,1,.5])}
+  for(let k=0;k<4;k++)for(let m=0;m<10;m++){const a=k*1.5708,r0=R+8+m*2.4;q.push([cx+Math.cos(a)*r0,cy+Math.sin(a)*r0,1.6,1,1,1,.5])}
+  const nn=Math.round(Ln/1.6);
+  for(let k=0;k<nn;k++){const u=(k+.5)/nn;for(let m=0;m<3;m++){q.push([cx,cy,2.2,1,1,1,1]);dd.push({j:q.length-1,u,side:1,lat:(m-1)*3.2*(1-u)+(rnd()-.5)*.8})}}
+  const ns=Math.round(Ln/2.4);
+  for(let k=0;k<ns;k++){const u=(k+.5)/ns;for(let m=0;m<2;m++){q.push([cx,cy,2,1,1,1,.32]);dd.push({j:q.length-1,u,side:-1,lat:(m-.5)*3*(1-u)})}}
+  const sig=vm*.055;for(let k=0;k<520;k++){const gx=gauss(),gy=gauss(),r=Math.hypot(gx,gy),core=Math.exp(-r*r*1.2);q.push([lx+gx*sig,ly+gy*sig,1.8+core*7,.78+.22*core,.88+.12*core,1,.35+.65*core])}
+  const fs=vm*(M?.36:.4),w=Math.ceil(fs*1.2),h=Math.ceil(fs*1.2);
+  const g=sampleDraw(w,h,c=>{c.font='200 '+fs+'px "Noto Serif SC","Noto Serif CJK SC","Source Han Serif SC","Songti SC",serif';c.textBaseline='alphabetic';c.fillText('希',fs*.05,fs*.98)},Math.max(3,Math.round(fs/60)),Math.max(2,fs/80),[1,1,1],vw*.05,vh*(M?.07:.06),1);
+  for(const e of g)q.push(e);
+  place(scenes[2],orders[2],q);
+  dyn={sc:scenes[2],idx:dd.map(o=>({i:orders[2][o.j],u:o.u,side:o.side,lat:o.lat})),cx,cy,Ln}}
+ {const cell=Math.max(M?8:9.3,Math.sqrt(vw*vh/15200)),cols=Math.ceil(vw/cell),rows=Math.ceil(vh/cell),dw=cols*cell,dh=rows*cell;
+  const iw=800,ih=450,sc=Math.max(dw/iw,dh/ih),sw_=dw/sc,sh_=dh/sc,fx=M?.7:.5;
+  place(scenes[3],orders[3],sampleImage(imgs.b,0,0,dw,dh,cell,false,.88,[(iw-sw_)*fx,(ih-sh_)*.5,sw_,sh_]))}
+ ready=true}
+let px=-999,py=-999,lastMove=-1e9,ang=0;
+addEventListener('pointermove',e=>{px=e.clientX;py=e.clientY;lastMove=performance.now()},{passive:true});
+const norm=a=>{a%=360;if(a>180)a-=360;if(a<-180)a+=360;return a};
+function compass(now){
+ const [lx,ly]=light(),cx=dyn.cx,cy=dyn.cy,la=Math.atan2(lx-cx,-(ly-cy))*180/Math.PI;let tg=la;
+ if(!RM&&now-lastMove<1500){const pa=Math.atan2(px-cx,-(py-cy))*180/Math.PI;tg=la+norm(pa-la)*.6*(1-(now-lastMove)/1500)}
+ ang+=norm(tg-ang)*(RM?1:.07);const a=ang*Math.PI/180,sx=Math.sin(a),sy=-Math.cos(a),qx=-sy,qy=sx,sc=dyn.sc;
+ for(const o of dyn.idx){const d=o.side*o.u*dyn.Ln;sc.x[o.i]=cx+sx*d+qx*o.lat;sc.y[o.i]=cy+sy*d+qy*o.lat}}
+const buf=new Float32Array(T*7);let uRes,uDpr;
+function glInit(){
+ const vs='attribute vec2 p;attribute float s;attribute vec4 c;uniform vec2 R;uniform float D;varying vec4 v;void main(){gl_Position=vec4(p.x/R.x*2.-1.,1.-p.y/R.y*2.,0,1);gl_PointSize=s*D;v=c;}';
+ const fs='precision mediump float;varying vec4 v;void main(){float d=length(gl_PointCoord-.5);float a=1.-smoothstep(.40,.5,d);if(a<=0.)discard;gl_FragColor=vec4(v.rgb,v.a*a);}';
+ const mk=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o};
+ const prog=gl.createProgram();gl.attachShader(prog,mk(gl.VERTEX_SHADER,vs));gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);
+ const bo=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bo);gl.bufferData(gl.ARRAY_BUFFER,buf.byteLength,gl.DYNAMIC_DRAW);
+ const st=28,at=(n,sz,o_)=>{const l=gl.getAttribLocation(prog,n);gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,sz,gl.FLOAT,false,st,o_)};
+ at('p',2,0);at('s',1,8);at('c',4,12);uRes=gl.getUniformLocation(prog,'R');uDpr=gl.getUniformLocation(prog,'D');
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)}
+function resize(){vw=innerWidth;vh=innerHeight;dpr=Math.min(devicePixelRatio||1,2);cv.width=Math.round(vw*dpr);cv.height=Math.round(vh*dpr);if(gl)gl.viewport(0,0,cv.width,cv.height)}
+const caps=$$('.pc'),shade=$('#shade'),pro=$('#pro');let t0=performance.now();
+function frame(now){
+ requestAnimationFrame(frame);if(!ready)return;
+ const top=pro.offsetTop;if(scrollY>top+pro.offsetHeight+10)return;
+ const t=(now-t0)/1000,p=clamp((scrollY-top)/Math.max(1,vh),0,NS-1),k=Math.min(Math.floor(p),NS-2),f=p-k,A=scenes[k],B=scenes[k+1];
+ compass(now);
+ const ef=ease(f),RMk=RM?0:1;
+ const pOn=now-lastMove<2500,R2=130*130;let n=0;
+ for(let i=0;i<N;i++){
+  const e=ease(clamp((f-dl[i])/.58)),ax=A.x[i],ay=A.y[i],bx=B.x[i],by=B.y[i],dx=bx-ax,dy=by-ay;
+  let x=ax+dx*e,y=ay+dy*e;
+  if(e>0&&e<1){const ln=Math.hypot(dx,dy)||1,s=Math.sin(3.1416*e)*sw[i]*Math.min(ln,420);x+=-dy/ln*s;y+=dx/ln*s}
+  const q=t*sp[i]+ph[i],am=(A.m[i]+(B.m[i]-A.m[i])*e)*RMk;x+=Math.sin(q)*am;y+=Math.cos(q*1.3)*am;
+  if(pOn){const ddx=x+ox[i]-px,ddy=y+oy[i]-py,d2=ddx*ddx+ddy*ddy;if(d2<R2&&d2>1){const d=Math.sqrt(d2),fo=(1-d/130)*1.6;vx[i]+=ddx/d*fo;vy[i]+=ddy/d*fo}}
+  vx[i]=(vx[i]-ox[i]*.045)*.9;vy[i]=(vy[i]-oy[i]*.045)*.9;ox[i]+=vx[i];oy[i]+=vy[i];x+=ox[i];y+=oy[i];
+  const a=A.a[i]+(B.a[i]-A.a[i])*e;if(a<.01)continue;
+  const o=n*7;buf[o]=x;buf[o+1]=y;buf[o+2]=A.s[i]+(B.s[i]-A.s[i])*e;buf[o+3]=A.r[i]+(B.r[i]-A.r[i])*e;buf[o+4]=A.g[i]+(B.g[i]-A.g[i])*e;buf[o+5]=A.b[i]+(B.b[i]-A.b[i])*e;buf[o+6]=a;n++}
+ const la=lightA[k]+(lightA[k+1]-lightA[k])*ef;
+ if(la>.01)for(let l=0;l<NL;l++){const L=lights[l],lx=((L.x+L.vx*(RM?0:t))%1+1)%1*vw,ly=((L.y+L.vy*(RM?0:t))%1+1)%1*vh;
+  for(let h=0;h<2;h++){const o=n*7;buf[o]=lx;buf[o+1]=ly;buf[o+2]=h?L.s:L.s*4;buf[o+3]=buf[o+4]=buf[o+5]=1;buf[o+6]=(h?L.a:.1)*la;n++}}
+ const bg=[0,1,2].map(c=>A.bg[c]+(B.bg[c]-A.bg[c])*ef);
+ if(gl){gl.clearColor(bg[0],bg[1],bg[2],1);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(uRes,vw,vh);gl.uniform1f(uDpr,dpr);gl.bufferSubData(gl.ARRAY_BUFFER,0,buf,0,n*7);gl.drawArrays(gl.POINTS,0,n)}
+ else{ctx2.setTransform(dpr,0,0,dpr,0,0);ctx2.globalAlpha=1;ctx2.fillStyle='rgb('+bg.map(v=>Math.round(v*255)).join(',')+')';ctx2.fillRect(0,0,vw,vh);for(let j=0;j<n;j++){const o=j*7;ctx2.globalAlpha=buf[o+6];ctx2.fillStyle='rgb('+Math.round(buf[o+3]*255)+','+Math.round(buf[o+4]*255)+','+Math.round(buf[o+5]*255)+')';ctx2.beginPath();ctx2.arc(buf[o],buf[o+1],buf[o+2]/2,0,6.3);ctx2.fill()}}
+ const idxS=Math.round(p);
+ caps.forEach((c,i)=>{const on=i===idxS&&Math.abs(p-i)<.28&&scrollY<top+pro.offsetHeight-vh*.4;c.classList.toggle('on',on)});
+ shade.style.opacity=clamp(1.2-Math.abs(p-3)*1.6);
+}
+const ld=src_=>new Promise(r=>{const im=new Image();im.onload=()=>r(im);im.src=src_});
+let imgs;resize();if(gl)glInit();
+Promise.all([ld(src('01_01')),ld(src('01_07'))]).then(([a,b])=>{imgs={a,b};build(imgs);window.__ready=true;requestAnimationFrame(frame)});
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{resize();if(imgs)build(imgs)},150)});
+})();
+</script>
+</body>
+</html>
