@@ -43,7 +43,7 @@ const idx=$('#idx'),lb=$('#lb');let lbList=[],lbPos=0,lastFocus=null;
 const openD=(d)=>{lastFocus=document.activeElement;d.showModal()};
 $('#idxbtn').addEventListener('click',()=>openD(idx));$('#idxx').addEventListener('click',()=>idx.close());
 idx.addEventListener('click',e=>{if(e.target.closest('a'))idx.close()});
-function showLb(){const k=lbList[lbPos];$('#lbi').src=src(k);$('#lbt').textContent='EP '+k.slice(0,2)+' · '+(lbPos+1)+' / '+lbList.length}
+function showLb(){const k=lbList[lbPos];$('#lbi').src=src(k);$('#lbt').textContent='EP '+k.slice(0,2)+(lbList.length>1?' · '+(lbPos+1)+' / '+lbList.length:'');$('#lbp').hidden=$('#lbnx').hidden=lbList.length<2}
 function openLb(k,list){lbList=list;lbPos=list.indexOf(k);showLb();openD(lb)}
 document.addEventListener('click',e=>{const b=e.target.closest('.sh button,.mos button');if(!b)return;const k=b.dataset.k;const ctx=b.closest('.mos')?$$('#mos button:not([hidden])').map(x=>x.dataset.k):[k];openLb(k,ctx)});
 $('#lbx').addEventListener('click',()=>lb.close());
