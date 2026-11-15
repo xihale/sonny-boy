@@ -1,29 +1,31 @@
 # SONNY BOY — 漂流之后
 
-动画《Sonny Boy》的非官方个人数字展览页(设计演示)。
+动画《Sonny Boy》的非官方数字展览页（设计演示）。
+
+以粒子序章、逐话剧照取色展厅、19 组角色展签、144 帧剧照墙与合成环境音，还原“少作说明、多留白”的观看体验。
 
 ## 直接运行
 
 ```bash
-git lfs install          # 首次需要,图片与音频由 Git LFS 管理
-git clone git@github.com:xihale/sonny-boy.git
+git lfs install          # 首次需要，图片与音频由 Git LFS 管理
+git clone https://github.com/xihale/sonny-boy.git
 cd sonny-boy
-# 双击 index.html 即可;或:
-python3 -m http.server 8000   # 然后访问 http://localhost:8000
+# 双击 index.html 即可；或：
+python3 -m http.server 8000   # 访问 http://localhost:8000
 ```
 
-不需要构建,不依赖外部网络。右上角“声音”按钮控制背景音乐(首次点击页面任意位置会自动淡入,可随时关闭)。
+无需构建，不依赖外部网络。点击页面后环境音会自动淡入，可通过右上角“声音”按钮随时开关。
 
 ## 结构
 
-- `index.html` 页面壳(仅 ~4KB,引 `assets/` 下的样式与脚本;序章两张取样图仍以 data-URI 内嵌在数据里,保证双击打开也能运行)
-- `assets/stills/` 144 张官方剧照(webp,1000px,文件名含内容哈希,改动即换 URL,浏览器可长缓存)
-- `assets/faces/` 25 张官方角色立绘(webp,透明底,同样带内容哈希)
-- `assets/audio/bgm.mp3` 背景音乐(原创氛围音,96 秒无缝循环,`src/make_bgm.py` 合成)
-- `src/` `data.py` 内容、`template.html` 模板、`style.css` 样式、`main.js` 渲染逻辑、`build.py` 生成脚本(需官方站素材,见脚本说明;构建时 CSS/数据/逻辑写入 assets/ 并按内容哈希命名)
+- `index.html`：页面壳（约 5KB，序章采样图以 data-URI 内嵌，支持本地直接打开）
+- `assets/stills/`：144 张剧照（WebP，内容哈希命名）
+- `assets/faces/`：25 张角色立绘（WebP，透明底，内容哈希命名）
+- `assets/audio/bgm.mp3`：环境音（96 秒无缝循环，由 `src/make_bgm.py` 合成）
+- `src/`：`data.py`（分集与角色文案）、`template.html`、`style.css`、`main.js`、`build.py`（构建脚本）
 
-换背景音乐:替换 `assets/audio/bgm.mp3` 即可。
+替换背景音乐只需覆盖 `assets/audio/bgm.mp3`。
 
 ## 声明
 
-非官方同人致敬作品,仅作设计演示。画面与角色 © Sonny Boy committee;文字为据官方网站与 Wikipedia 整理的中文概述。
+非营利同人数字展览，仅作设计与研究演示。画面与角色版权归 © Sonny Boy committee 所有。
